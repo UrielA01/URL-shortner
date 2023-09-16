@@ -27,7 +27,14 @@ const validateURL = () => {
                 const shortUrl = findObjectInArray(URLs, "originalURL", url)
                 throw new Error(`URL already in the DB: ${shortUrl.shortURL}`);
             }
-        })
+        }),
+        (req, res, next) => {
+        const errors = validationResult(req);
+        if (!errors.isEmpty()) {
+        return res.status(400).json({ errors: errors.array() });
+        }
+        next();
+    }
     ];
   }
   
@@ -44,10 +51,6 @@ app.get('/', (req, res) => {
 
 app.post('/url', validateURL(),
         (req, res) => {
-        const errors = validationResult(req);
-        if (!errors.isEmpty()) {
-            return res.status(400).json({ errors: errors.array() });
-        }
         const { url } = req.body;
         const ID = generateShortUrl(5);
         const shortURL: string = "http://localhost:3000/" + ID;
@@ -57,15 +60,16 @@ app.post('/url', validateURL(),
             shortURL: shortURL
         };
 
-        if (!doesValueExistInArray(URLs, url, "originalURL")) {
-            URLs.push(newUrl);
-        }
+        URLs.push(newUrl);
 
         console.log(URLs);
+        
         
         res.sendStatus(201);
 });
 
 app.get('/:urlID', (req, res) => {
-    res.send('');
+    const { urlID } = req.params;
+    const shortURL:ShortUrl = findObjectInArray(URLs, "generatedID", urlID);
+    res.send(shortURL.originalURL);
 });
