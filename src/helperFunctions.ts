@@ -10,7 +10,7 @@ const generateShortUrl = (length:number) => {
     return result;
 }
 
-const doesValueExistInArray = (array:Array<any>, value, property): boolean => {
+const doesValueExistInArray = (array:Array<any>, property, value): boolean => {
     const targetValue = value;
     const propertyName = property;
     
@@ -22,10 +22,6 @@ const findObjectInArray = <T>(
     key: keyof T,
     value: T[keyof T]
   ): T | null => arr.find(obj => obj[key] === value) || null;
-  
-const isURL = (url: string): boolean => {
-    const urlRegex = /^(https?|ftp|file):\/\/[-A-Za-z0-9+&@#/%?=~_|!:,.;]+[-A-Za-z0-9+&@#/%=~_|]$/;
-    return urlRegex.test(url);
-};
 
-export {generateShortUrl, doesValueExistInArray, findObjectInArray, isURL};
+
+export {generateShortUrl, doesValueExistInArray, findObjectInArray};

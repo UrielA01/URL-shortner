@@ -1,5 +1,6 @@
 import express from 'express';
-import {generateShortUrl, doesValueExistInArray, findObjectInArray, isURL} from './helperFunctions'
+import {generateShortUrl, doesValueExistInArray, findObjectInArray} from './helperFunctions'
+import { body, validationResult } from 'express-validator';
 
 const app = express();
 const port = process.env.PORT || 3000;
@@ -9,12 +10,29 @@ interface ShortUrl {
     generatedID: string
     shortURL: string
   }
+
+const URLs:Array<ShortUrl> = []
+
+const validateURL = () => {
+    return [
+      body('url')
+        .isURL()
+        .withMessage('Invalid URL')
+        .exists()
+        .withMessage('URL is required')
+        .trim()
+        .custom(async url => {
+            const existingUrl = await doesValueExistInArray(URLs, "originalURL", url);
+            if (existingUrl) {
+                const shortUrl = findObjectInArray(URLs, "originalURL", url)
+                throw new Error(`URL already in the DB: ${shortUrl.shortURL}`);
+            }
+        })
+    ];
+  }
   
 
-const URLs: ShortUrl[] = []
-
 app.use(express.json());
-app.use(express.urlencoded());
 
 app.listen(port, () => {
   console.log(`Server is running on port ${port}`);
@@ -24,21 +42,12 @@ app.get('/', (req, res) => {
     res.send('Hello, Express with TypeScript!');
 });
 
-app.post('/url', (req, res, next) => {
-    const { url } = req.body;
-    if (!isURL(url)) {
-        res.send("This is not a URL!");   
-    }else
-        next();
-    }, (req, res, next) => {
-        const { url } = req.body;
-        if (doesValueExistInArray(URLs, url, "originalURL")) {
-            const Shorturl = findObjectInArray(URLs, "originalURL", url)
-            res.send(`URL already in the DB: ${Shorturl.shortURL}`)
-        }else
-            next();
-        }, 
+app.post('/url', validateURL(),
         (req, res) => {
+        const errors = validationResult(req);
+        if (!errors.isEmpty()) {
+            return res.status(400).json({ errors: errors.array() });
+        }
         const { url } = req.body;
         const ID = generateShortUrl(5);
         const shortURL: string = "http://localhost:3000/" + ID;
