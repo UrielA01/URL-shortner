@@ -1,18 +1,20 @@
 import mongoose from 'mongoose';
 
-const ShortURL = new mongoose.Schema({
+const { Schema, model } = mongoose;
+
+const ShortURLSchema = new Schema({
     originalURL: {
-        type: mongoose.SchemaTypes.String,
+        type: String,
         required: true
     },
     generatedID: {
-        type: mongoose.SchemaTypes.String,
+        type: String,
         required: true
     },
     shortURL: {
-        type: mongoose.SchemaTypes.String,
+        type: String,
         required: true
     }
 });
 
-module.exports = mongoose.model('shortUrl', ShortURL)
+export const URLSchema = model('short_urls', ShortURLSchema);

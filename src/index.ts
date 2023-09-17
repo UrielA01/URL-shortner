@@ -2,6 +2,7 @@ import express from 'express';
 import { generateShortUrl, doesValueExistInArray, findObjectInArray } from './helperFunctions'
 import { body, validationResult } from 'express-validator';
 import "./DB/index";
+import { URLSchema } from "./DB/Schemas/URLSchema";
 
 const app = express();
 const port = process.env.PORT || 3000;
@@ -52,7 +53,7 @@ app.get('/', (req, res) => {
 });
 
 app.post('/url', validateURL(),
-  (req, res) => {
+  async (req, res) => {
     const { url } = req.body;
     const ID = generateShortUrl(5);
     const shortURL: string = LOCALURL + ID;
@@ -63,6 +64,9 @@ app.post('/url', validateURL(),
     };
 
     URLs.push(newUrl);
+
+    const newURLRecord = await URLSchema.create(newUrl);
+
     res.send(newUrl.generatedID);
   });
 
