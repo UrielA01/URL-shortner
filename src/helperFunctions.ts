@@ -1,4 +1,4 @@
-const generateShortUrl = (length: number) => {
+const generateShortUrl = (length: number): string => {
   let result = '';
   const characters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
   const charactersLength = characters.length;
@@ -10,18 +10,5 @@ const generateShortUrl = (length: number) => {
   return result;
 }
 
-const doesValueExistInArray = (array: Array<any>, property, value): boolean => {
-  const targetValue = value;
-  const propertyName = property;
 
-  return array.some((obj) => obj[propertyName] === targetValue);
-}
-
-const findObjectInArray = <T>(
-  arr: T[],
-  key: keyof T,
-  value: T[keyof T]
-): T | null => arr.find(obj => obj[key] === value) || null;
-
-
-export { generateShortUrl, doesValueExistInArray, findObjectInArray };
+export { generateShortUrl };
