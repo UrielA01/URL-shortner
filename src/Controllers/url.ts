@@ -10,6 +10,16 @@ interface ShortUrl {
     shortURL: string
 }
 
+const createURLRecord = async (originalURL, generatedID, shortURL) => {
+    const newUrl = {
+        originalURL,
+        generatedID,
+        shortURL,
+    };
+
+    return await URLSchema.create(newUrl);
+};
+
 const validateURL = () => {
     return [
         body('url')
@@ -38,17 +48,6 @@ const validateURL = () => {
         }
     ];
 }
-
-
-const createURLRecord = async (originalURL, generatedID, shortURL) => {
-    const newUrl = {
-        originalURL,
-        generatedID,
-        shortURL,
-    };
-
-    return await URLSchema.create(newUrl);
-};
 
 const postURL = async (req: Request, res: Response) => {
     try {
