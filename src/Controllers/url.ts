@@ -39,18 +39,24 @@ const validateURL = () => {
     ];
 }
 
+
+const createURLRecord = async (originalURL, generatedID, shortURL) => {
+    const newUrl = {
+        originalURL,
+        generatedID,
+        shortURL,
+    };
+
+    return await URLSchema.create(newUrl);
+};
+
 const postURL = async (req: Request, res: Response) => {
     try {
         const { url } = req.body;
-        const ID: string = generateShortUrl(5);
-        const shortURL: string = LOCALURL + ID;
-        const newUrl: ShortUrl = {
-            originalURL: url,
-            generatedID: ID,
-            shortURL: shortURL
-        };
+        const generatedID: string = generateShortUrl(5);
+        const shortURL: string = LOCALURL + generatedID;
 
-        const newURLRecord: ShortUrl = await URLSchema.create(newUrl);
+        const newURLRecord = await createURLRecord(url, generatedID, shortURL);
         res.status(201).json(newURLRecord);
     } catch (error) {
         console.error(error);
@@ -58,4 +64,15 @@ const postURL = async (req: Request, res: Response) => {
     }
 };
 
-export { validateURL, postURL }
+const getURL = async (req: Request, res: Response) => {
+    try {
+        const { urlID } = req.params;
+        const fullURL: ShortUrl | null = await URLSchema.findOne({ generatedID: urlID });
+        res.status(201).json(fullURL.originalURL);
+    } catch (error) {
+        console.error(error);
+        res.status(500).json({ error: 'Server error' });
+    }
+};
+
+export { validateURL, postURL, getURL }
