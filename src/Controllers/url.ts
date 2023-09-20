@@ -30,7 +30,10 @@ const validateURL = () => {
             .trim()
             .custom(async (url: string) => {
                 try {
-                    const urlExist: ShortUrl | null = await URLSchema.findOne({ originalURL: url });
+                    const urlExist: ShortUrl | null = await URLSchema.findOne(
+                        { $or: [{ originalURL: 'https://' + url }, { originalURL: 'http://' + url }, { originalURL: url }] }
+                    );
+
                     if (urlExist) {
                         throw new Error(`URL already in the DB: ${urlExist.shortURL}`);
                     }
@@ -42,8 +45,6 @@ const validateURL = () => {
         (req: Request, res: Response, next: NextFunction) => {
             const errors = validationResult(req);
             if (!errors.isEmpty()) {
-                console.log(errors.array()[0]);
-
                 return res.status(500).json({ error: errors.array()[0] });
             }
             next();
