@@ -10,7 +10,11 @@ interface ShortUrl {
     shortURL: string
 }
 
-const createURLRecord = async (originalURL, generatedID, shortURL) => {
+const createURLRecord = async (
+    originalURL: string,
+    generatedID: string,
+    shortURL: string
+    ) => {
     const newUrl = {
         originalURL,
         generatedID,
