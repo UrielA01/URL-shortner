@@ -42,7 +42,9 @@ const validateURL = () => {
         (req: Request, res: Response, next: NextFunction) => {
             const errors = validationResult(req);
             if (!errors.isEmpty()) {
-                return res.status(400).json({ errors: errors.array() });
+                console.log(errors.array()[0]);
+
+                return res.status(500).json({ error: errors.array()[0] });
             }
             next();
         }
@@ -51,10 +53,12 @@ const validateURL = () => {
 
 const postURL = async (req: Request, res: Response) => {
     try {
-        const { url } = req.body;
+        let { url } = req.body;
+        if (!url.startsWith('http://') && !url.startsWith('https://')) {
+            url = 'https://' + url;
+        }
         const generatedID: string = generateShortUrl(5);
         const shortURL: string = LOCALURL + generatedID;
-
         const newURLRecord = await createURLRecord(url, generatedID, shortURL);
         res.status(201).json(newURLRecord);
     } catch (error) {
